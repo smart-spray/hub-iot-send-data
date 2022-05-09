@@ -36,8 +36,8 @@
 <div id='Esp32'>
   
 # Enviando dados para ESP32
-  Para que funcionasse o envio de dados para ESP32, foi necessário fazer a alteração de dois arquivos da bibliotca o Azure IoT.
-  Leia o arquivo Readme para mais informações.
+  Para que funcionasse o envio de dados para ESP32, foi necessário fazer a alteração de dois arquivos da biblioteca o Azure IoT.
+  Leia o arquivo Readme que está dentro da pasta 'lib' para mais informações.
   
   Além disso, foi usado um software em python para que na fase inicial dos testes pudessemos simular o comando que viria posteriormente do apk.
   
