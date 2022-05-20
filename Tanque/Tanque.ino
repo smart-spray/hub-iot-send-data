@@ -16,9 +16,8 @@ static bool hasIoTHub = false;
    Componente          Pino na Esp32
    Sensor Turbidez  :  34
    Sensor PH        :  35
-   Solenoide 1 (V1) :  18
-   Solenoide 2 (V2) :  23
-   Solenoide 3 (V3) :  22
+   Solenoide 2 (V1) :  23
+   Solenoide 3 (V2) :  22
    Bomba            :  19
 */
 
@@ -81,27 +80,38 @@ void loop() {
         ph = CalculaPh(LeituraAnalogica(35));
         tb = CalculaTurbidez(LeituraAnalogica(34)); 
 
-        while ( ((ph > 6) && (ph < 8) ) && ((tb > 900) && (tb < 1200))){
+        //while ( ((ph < 6) || (ph > 8) ) && ((tb < 900) || (tb > 1200))){
+        while ((tb > 1500) ||  ((ph < 4) ||(ph > 9) )) {
+        
               Serial.println("limpando...");
-              LigaSaidaDigital(18); //Liga V1
-              LigaSaidaDigital(23); //Liga V2
-              DesligaSaidaDigital(22); //Desliga V3
-              delay(700);
+              DesligaSaidaDigital(19); //Desliga Bomba
+              delay(100);
+              LigaSaidaDigital(23); //Liga V1
+              Serial.println ("Liga V1...");
+              
+              /*Espera encher o tanque 
+              (verificar o tempo correto já que não temos sensor de nível)
+              */
+              delay(30000);
+              
+              DesligaSaidaDigital(23); //Desliga V1
+              delay(1000);
               LigaSaidaDigital(19); //Liga Bomba 
+              Serial.println ("Bomba ligada...");
+              delay(500);
 
               /*Espera encher o tanque 
               (verificar o tempo correto já que não temos sensor de nível)
               */
-              delay(15000);
+              
+              //Desliga V1 e Liga V2 para deixar a água sair nos pulverizadores
 
-              //Desliga V1 e Liga V3 para deixar a água sair nos pulverizadores
-
-              DesligaSaidaDigital(18); //Desliga V1      
-              LigaSaidaDigital(22); //Liga V3
-              delay(10000);
+              LigaSaidaDigital(22); //Liga V2
+              Serial.println ("Liga V2...");
+              delay(700);
 
               // Faz as medições
-              ph = CalculaPh(LeituraAnalogica(35));
+              ph = CalculaPh(LeituraAnalogica(35));              
               tb = CalculaTurbidez(LeituraAnalogica(34));
 
               //Envia mensagem para nuvem
@@ -126,9 +136,8 @@ void loop() {
               if(p != NULL && (strcmp(p, "S") == 0)){
                 Serial.println("Limpeza parada pelo usuário...");
                 DesligaSaidaDigital(19); //Desliga Bomba
-                DesligaSaidaDigital(18); //Desliga V1            
-                DesligaSaidaDigital(23); //Desliga V2
-                DesligaSaidaDigital(22); //Desliga V3                
+                DesligaSaidaDigital(23); //Desliga V1            
+                DesligaSaidaDigital(22); //Desliga V2                
                 //força valor do tb e ph para parar a pulverização
                 tb = 1000;
                 ph = 7;
@@ -152,7 +161,7 @@ void loop() {
 
       tb = CalculaTurbidez(LeituraAnalogica(34));
             
-      while (tb < 4000){//Loop pulverização
+      while (tb < 3000){//Loop pulverização
         Serial.println("Pulverizando..."); 
         ph = CalculaPh(LeituraAnalogica(35));
         tb = CalculaTurbidez(LeituraAnalogica(34));
@@ -163,11 +172,10 @@ void loop() {
         Serial.print("Valor do tb: ");
         Serial.println(tb);
     
-        Serial.println("Ligando V2, V3 e a Bomba");
+        Serial.println("Ligando V1, V2 e a Bomba");
               
-        DesligaSaidaDigital(18); //Desliga V1            
-        LigaSaidaDigital(23); //Liga V2
-        LigaSaidaDigital(22); //Liga V3
+        DesligaSaidaDigital(23); //Desliga V1            
+        LigaSaidaDigital(22); //Liga V2
         delay(700);
         LigaSaidaDigital(19); //Liga Bomba 
         delay(5000);
@@ -194,9 +202,8 @@ void loop() {
         if(p != NULL && (strcmp(p, "S") == 0)){
           Serial.println("Pulverização parada pelo usuário...");
           DesligaSaidaDigital(19); //Desliga Bomba
-          DesligaSaidaDigital(18); //Desliga V1            
-          DesligaSaidaDigital(23); //Desliga V2
-          DesligaSaidaDigital(22); //Desliga V3          
+          DesligaSaidaDigital(23); //Desliga V1                      
+          DesligaSaidaDigital(22); //Desliga V2          
           //força valor do tb para parar a pulverização
           tb = 4000;
         }
